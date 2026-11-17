@@ -406,7 +406,7 @@ impl App {
 
             ui.separator();
             ui.heading("关于");
-            ui.label("作者：风不休");
+            ui.label("作者：和风");
             ui.label("邮箱：dreign@qq.com");
             ui.horizontal(|ui| {
                 ui.label("网站：");

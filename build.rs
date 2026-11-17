@@ -15,12 +15,12 @@ fn main() {
     res.set_icon("assets/icon.ico")
         .set("FileDescription", "高性能跨平台桌面截图软件")
         .set("ProductName", "ScreenCapture")
-        .set("CompanyName", "风不休")
-        .set("LegalCopyright", "© 2026 风不休 <dreign@qq.com> · https://hefeng.chat/")
+        .set("CompanyName", "和风")
+        .set("LegalCopyright", "© 2026 和风 <dreign@qq.com> · https://hefeng.chat/")
         .set("OriginalFilename", "ScreenCapture.exe")
         .set("ProductVersion", env!("CARGO_PKG_VERSION"))
         .set("FileVersion", env!("CARGO_PKG_VERSION"))
-        .set("Comments", "作者：风不休 · dreign@qq.com · https://hefeng.chat/");
+        .set("Comments", "作者：和风 · dreign@qq.com · https://hefeng.chat/");
 
     if let Err(err) = res.compile() {
         // 资源编译依赖 Windows SDK 的 rc.exe，失败时给出明显提示而不是静默跳过

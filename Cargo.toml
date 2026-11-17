@@ -2,7 +2,7 @@
 name = "screencapture"
 version = "0.8.0"
 edition = "2021"
-authors = ["风不休 <dreign@qq.com>"]
+authors = ["和风 <dreign@qq.com>"]
 description = "高性能跨平台桌面截图软件（Windows / macOS）"
 homepage = "https://hefeng.chat/"
 license = "MIT"

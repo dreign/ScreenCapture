@@ -225,7 +225,7 @@ CI 配置见 `.github/workflows/ci.yml`（Windows + macOS 双平台 fmt / clippy
 
 | 项目 | 信息 |
 |------|------|
-| 作者 | 风不休 |
+| 作者 | 和风 |
 | 邮箱 | [dreign@qq.com](mailto:dreign@qq.com) |
 | 网站 | [https://hefeng.chat/](https://hefeng.chat/) |
 
@@ -233,4 +233,4 @@ Windows 产物已嵌入版本资源，右键 `ScreenCapture.exe` →「属性 �
 
 ## 📄 License
 
-MIT License · © 2026 风不休
+MIT License · © 2026 和风

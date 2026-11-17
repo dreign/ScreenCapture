@@ -59,7 +59,7 @@ cat > "$CONTENTS/Info.plist" <<PLIST
     <key>LSMinimumSystemVersion</key>
     <string>11.0</string>
     <key>NSHumanReadableCopyright</key>
-    <string>© 2026 风不休 &lt;dreign@qq.com&gt; · https://hefeng.chat/</string>
+    <string>© 2026 和风 &lt;dreign@qq.com&gt; · https://hefeng.chat/</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSPrincipalClass</key>
