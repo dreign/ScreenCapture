@@ -1,0 +1,20 @@
+# Rust
+/target
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# 构建产物
+*.exe
+*.pdb
+/dist/
+
+# 配置（用户本地配置不入库）
+config.local.toml

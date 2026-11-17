@@ -1,0 +1,78 @@
+[package]
+name = "screencapture"
+version = "0.8.0"
+edition = "2021"
+authors = ["风不休 <dreign@qq.com>"]
+description = "高性能跨平台桌面截图软件（Windows / macOS）"
+homepage = "https://hefeng.chat/"
+license = "MIT"
+
+[dependencies]
+# GUI：只依赖 eframe，egui 统一通过 `eframe::egui` 使用，
+# 避免同时声明 eframe / egui 导致两份 egui（macOS 上尤易出现版本冲突）
+eframe = "0.29"
+
+# 图片处理
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "bmp"] }
+
+# 标注文字光栅化（导出时把文字烘焙进像素）
+ab_glyph = "0.2"
+
+# 系统剪贴板
+arboard = "3.4"
+
+# 配置
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+
+# 本地时间（文件名模板）
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+
+# 错误与工具
+anyhow = "1"
+parking_lot = "0.12"
+
+# ---------------- Windows 专属 ----------------
+
+[target.'cfg(windows)'.dependencies]
+# Windows 原生 API（GDI 截图、窗口/显示器枚举、DPI、托盘、热键、注册表）
+windows = { version = "0.58", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_Graphics_Dwm",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_HiDpi",
+    "Win32_System_Threading",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Registry",
+    "Win32_System_SystemInformation",
+    "Win32_UI_Shell",
+    "Win32_Storage_Xps",
+] }
+
+# ---------------- macOS 专属 ----------------
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# 屏幕 / 窗口捕获与枚举（CoreGraphics）
+xcap = "0.4"
+# 菜单栏托盘图标
+tray-icon = "0.19"
+# 全局热键
+global-hotkey = "0.6"
+
+# ---------------- 构建脚本 ----------------
+
+[build-dependencies]
+# Windows 可执行文件版本资源（作者 / 版本 / 版权）
+winres = "0.1"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.dev]
+opt-level = 1
