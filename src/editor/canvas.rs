@@ -9,6 +9,7 @@ use eframe::egui::{self, Align2, Color32, FontId, Pos2, Rect, Sense, Shape, Stro
 
 use super::{Annotation, AnnotationData, EditorState, ToolType};
 use crate::capture::CapturedImage;
+use crate::theme;
 
 /// 画布返回给上层的信息
 #[derive(Default)]
@@ -70,7 +71,7 @@ impl EditorCanvas {
         let area = ui.available_rect_before_wrap();
         let response = ui.allocate_rect(area, Sense::click_and_drag());
         let painter = ui.painter_at(area);
-        painter.rect_filled(area, 0.0, Color32::from_gray(26));
+        painter.rect_filled(area, 0.0, theme::canvas::BACKDROP);
 
         let (iw, ih) = (image.width as f32, image.height as f32);
         let fit = (area.width() / iw).min(area.height() / ih).max(0.0001);
@@ -108,7 +109,7 @@ impl EditorCanvas {
         self.cursor = pointer_img;
 
         // ---- 底图 ----
-        painter.rect_filled(image_rect, 0.0, Color32::from_gray(60));
+        painter.rect_filled(image_rect, 0.0, theme::canvas::PLACEHOLDER);
         painter.image(
             self.texture.id(),
             image_rect,
@@ -132,7 +133,7 @@ impl EditorCanvas {
         self.draw_preview(&ann_painter, state, image, pointer_img, image_rect, scale);
 
         // ---- 图片边框 ----
-        painter.rect_stroke(image_rect, 0.0, Stroke::new(1.0_f32, Color32::from_gray(90)));
+        painter.rect_stroke(image_rect, 0.0, Stroke::new(1.0_f32, theme::canvas::BORDER));
 
         // ---- 光标样式 ----
         if response.hovered() {
@@ -155,9 +156,10 @@ impl EditorCanvas {
         draw_pill(&painter, area.left_bottom() + Vec2::new(10.0, -30.0), &info);
 
         let hint = "滚轮缩放 · 中键/选择工具 拖拽平移 · Ctrl+Z 撤销";
-        let galley = painter.layout_no_wrap(hint.to_string(), FontId::proportional(12.0), Color32::from_gray(190));
+        let galley =
+            painter.layout_no_wrap(hint.to_string(), FontId::proportional(theme::text::CAPTION), theme::canvas::HINT);
         let pos = Pos2::new(area.max.x - galley.size().x - 10.0, area.max.y - 24.0);
-        painter.galley(pos, galley, Color32::from_gray(190));
+        painter.galley(pos, galley, theme::canvas::HINT);
 
         // ---- 文字输入弹窗 ----
         self.show_text_draft(ui.ctx(), state);
@@ -443,7 +445,9 @@ impl EditorCanvas {
                             cancelled = true;
                         }
                     });
-                    ui.label(egui::RichText::new("Ctrl+Enter 确定 · Esc 取消").small().color(Color32::from_gray(140)));
+                    ui.label(
+                        egui::RichText::new("Ctrl+Enter 确定 · Esc 取消").small().color(theme::canvas::TEXT_MUTED),
+                    );
 
                     if ui.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::Enter)) {
                         submitted = Some((draft.pos, draft.text.clone()));
@@ -646,10 +650,11 @@ fn sample_pixel(image: &CapturedImage, x: i32, y: i32) -> Color32 {
 
 /// 深色胶囊背景标签
 fn draw_pill(painter: &egui::Painter, pos: Pos2, text: &str) {
-    let galley = painter.layout_no_wrap(text.to_string(), FontId::proportional(12.0), Color32::WHITE);
+    let galley =
+        painter.layout_no_wrap(text.to_string(), FontId::proportional(theme::text::CAPTION), theme::overlay::TEXT);
     let bg = Rect::from_min_size(pos - Vec2::new(7.0, 4.0), galley.size() + Vec2::new(14.0, 8.0));
-    painter.rect_filled(bg, 5.0, Color32::from_black_alpha(190));
-    painter.galley(pos, galley, Color32::WHITE);
+    painter.rect_filled(bg, theme::radius::MEDIUM, theme::overlay::PILL_BG);
+    painter.galley(pos, galley, theme::overlay::TEXT);
 }
 
 #[cfg(test)]

@@ -9,6 +9,7 @@
 use eframe::egui::{self, Color32, CursorIcon, FontId, Pos2, Rect, Sense, Vec2};
 
 use crate::capture::CapturedImage;
+use crate::theme;
 
 pub struct PinWindow {
     viewport: egui::ViewportId,
@@ -97,16 +98,16 @@ impl PinWindow {
                 let hint = "拖拽移动 · 双击 / Esc 关闭";
                 let galley = ui.painter().layout_no_wrap(
                     hint.to_string(),
-                    FontId::proportional(11.0),
-                    Color32::from_white_alpha(220),
+                    FontId::proportional(theme::text::TINY),
+                    theme::overlay::TEXT_MUTED,
                 );
                 let pos = Pos2::new(rect.center().x - galley.size().x / 2.0, rect.max.y - galley.size().y - 6.0);
                 ui.painter().rect_filled(
                     Rect::from_min_size(pos - Vec2::new(6.0, 3.0), galley.size() + Vec2::new(12.0, 6.0)),
-                    4.0,
-                    Color32::from_black_alpha(140),
+                    theme::radius::SMALL,
+                    theme::overlay::PILL_BG,
                 );
-                ui.painter().galley(pos, galley, Color32::WHITE);
+                ui.painter().galley(pos, galley, theme::overlay::TEXT);
             });
         });
 

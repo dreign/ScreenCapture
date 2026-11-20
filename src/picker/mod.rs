@@ -9,6 +9,7 @@
 use eframe::egui::{self, Color32, FontId, Pos2, Rect, Sense, Stroke, Vec2};
 
 use crate::capture::{self, CapturedImage, Rect as CaptureRect, WindowInfo};
+use crate::theme;
 
 /// 选区交互结果
 pub enum PickerOutcome {
@@ -222,7 +223,7 @@ impl Picker {
                 // ---------------- 绘制 ----------------
                 if let Some(sel) = self.selection {
                     let s = Rect::from_min_max(to_screen(sel.min), to_screen(sel.max));
-                    let dim = Color32::from_black_alpha(120);
+                    let dim = theme::overlay::SCRIM;
                     // 四块压暗（选区外）
                     painter.rect_filled(Rect::from_min_max(screen.min, Pos2::new(screen.max.x, s.min.y)), 0.0, dim);
                     painter.rect_filled(Rect::from_min_max(Pos2::new(screen.min.x, s.max.y), screen.max), 0.0, dim);
@@ -237,9 +238,13 @@ impl Picker {
                         dim,
                     );
                     // 选区边框 + 角点
-                    painter.rect_stroke(s, 0.0, Stroke::new(1.5_f32, Color32::from_rgb(0, 174, 255)));
+                    painter.rect_stroke(s, 0.0, Stroke::new(1.5_f32, theme::overlay::ACCENT));
                     for corner in [s.left_top(), s.right_top(), s.left_bottom(), s.right_bottom()] {
-                        painter.rect_filled(Rect::from_center_size(corner, Vec2::splat(6.0)), 1.0, Color32::WHITE);
+                        painter.rect_filled(
+                            Rect::from_center_size(corner, Vec2::splat(6.0)),
+                            1.0,
+                            theme::overlay::TEXT,
+                        );
                     }
                     // 尺寸标签
                     let label = format!("{} × {}", sel.width().round() as i32, sel.height().round() as i32);
@@ -247,7 +252,7 @@ impl Picker {
                     draw_pill(&painter, label_pos, &label);
                 } else if let Some((title, rect)) = &self.hover {
                     let s = Rect::from_min_max(to_screen(rect.min), to_screen(rect.max));
-                    painter.rect_stroke(s, 0.0, Stroke::new(2.0_f32, Color32::from_rgb(255, 72, 72)));
+                    painter.rect_stroke(s, 0.0, Stroke::new(2.0_f32, theme::overlay::HOVER));
                     let label = format!("{}  {:.0} × {:.0}", title, rect.width(), rect.height());
                     draw_pill(&painter, Pos2::new(s.min.x + 2.0, (s.min.y - 26.0).max(screen.min.y)), &label);
                 }
@@ -255,7 +260,7 @@ impl Picker {
                 // 十字辅助线 + 放大镜
                 if let Some(p) = pointer {
                     let pp = to_screen(p);
-                    let line = Color32::from_white_alpha(70);
+                    let line = theme::overlay::CROSSHAIR;
                     painter.line_segment(
                         [Pos2::new(screen.min.x, pp.y), Pos2::new(screen.max.x, pp.y)],
                         Stroke::new(1.0_f32, line),
@@ -270,14 +275,18 @@ impl Picker {
                 // 顶部操作提示
                 let hint =
                     "拖拽选择 · Enter/双击 确认 · Esc 取消 · 方向键微调(Shift×10) · Ctrl+方向键 调尺寸 · Ctrl+A 全选";
-                let galley = painter.layout_no_wrap(hint.to_string(), FontId::proportional(13.0), Color32::WHITE);
+                let galley = painter.layout_no_wrap(
+                    hint.to_string(),
+                    FontId::proportional(theme::text::HINT),
+                    theme::overlay::TEXT,
+                );
                 let hint_pos = Pos2::new(screen.center().x - galley.size().x / 2.0, screen.min.y + 14.0);
                 painter.rect_filled(
                     Rect::from_min_size(hint_pos - Vec2::new(10.0, 5.0), galley.size() + Vec2::new(20.0, 10.0)),
-                    6.0,
-                    Color32::from_black_alpha(180),
+                    theme::radius::MEDIUM,
+                    theme::overlay::PILL_BG,
                 );
-                painter.galley(hint_pos, galley, Color32::WHITE);
+                painter.galley(hint_pos, galley, theme::overlay::TEXT);
             });
         });
 
@@ -317,8 +326,8 @@ impl Picker {
 
         painter.rect_filled(
             Rect::from_min_size(origin - Vec2::splat(2.0), box_size + Vec2::splat(4.0)),
-            3.0,
-            Color32::from_black_alpha(220),
+            theme::radius::SMALL,
+            theme::overlay::PILL_BG,
         );
 
         let half = N / 2;
@@ -344,7 +353,7 @@ impl Picker {
         // 中心像素描边
         let center_cell =
             Rect::from_min_size(origin + Vec2::new(half as f32 * CELL, half as f32 * CELL), Vec2::splat(CELL));
-        painter.rect_stroke(center_cell, 0.0, Stroke::new(1.0_f32, Color32::WHITE));
+        painter.rect_stroke(center_cell, 0.0, Stroke::new(1.0_f32, theme::overlay::TEXT));
 
         // 信息条：屏幕坐标 + HEX + RGB
         let text = format!(
@@ -364,10 +373,11 @@ impl Picker {
 
 /// 画一个深色胶囊背景的文字标签
 fn draw_pill(painter: &egui::Painter, pos: Pos2, text: &str) {
-    let galley = painter.layout_no_wrap(text.to_string(), FontId::proportional(12.0), Color32::WHITE);
+    let galley =
+        painter.layout_no_wrap(text.to_string(), FontId::proportional(theme::text::CAPTION), theme::overlay::TEXT);
     let bg = Rect::from_min_size(pos - Vec2::new(5.0, 3.0), galley.size() + Vec2::new(10.0, 6.0));
-    painter.rect_filled(bg, 4.0, Color32::from_black_alpha(200));
-    painter.galley(pos, galley, Color32::WHITE);
+    painter.rect_filled(bg, theme::radius::SMALL, theme::overlay::PILL_BG);
+    painter.galley(pos, galley, theme::overlay::TEXT);
 }
 
 /// 选区（覆盖层本地 pt）→ 整屏截图内的像素矩形

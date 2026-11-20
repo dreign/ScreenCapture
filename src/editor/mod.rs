@@ -9,6 +9,8 @@ pub mod render;
 
 use eframe::egui::{self, Color32, Sense, Stroke, Vec2};
 
+use crate::theme;
+
 pub use canvas::EditorCanvas;
 
 /// 工具类型
@@ -124,7 +126,7 @@ impl Default for EditorState {
     fn default() -> Self {
         Self {
             current_tool: ToolType::Pen,
-            color: Color32::from_rgb(255, 59, 48),
+            color: theme::ANNOTATION_DEFAULT,
             thickness: 3.0,
             font_size: 20.0,
             filled: false,
@@ -200,16 +202,7 @@ pub enum EditorAction {
     ClearAll,
 }
 
-const PRESET_COLORS: [Color32; 8] = [
-    Color32::from_rgb(255, 59, 48),
-    Color32::from_rgb(255, 149, 0),
-    Color32::from_rgb(255, 214, 10),
-    Color32::from_rgb(52, 199, 89),
-    Color32::from_rgb(0, 174, 255),
-    Color32::from_rgb(90, 120, 255),
-    Color32::WHITE,
-    Color32::from_rgb(30, 30, 30),
-];
+const PRESET_COLORS: [Color32; 8] = theme::ANNOTATION_COLORS;
 
 /// 绘制编辑器工具栏（工具 / 颜色 / 粗细 / 字号 / 撤销重做 / 输出）
 pub fn draw_toolbar(ui: &mut egui::Ui, state: &mut EditorState) -> Option<EditorAction> {
@@ -283,11 +276,11 @@ pub fn draw_toolbar(ui: &mut egui::Ui, state: &mut EditorState) -> Option<Editor
 /// 一个可点击的色块
 fn color_swatch(ui: &mut egui::Ui, color: Color32, selected: bool) -> bool {
     let (rect, response) = ui.allocate_exact_size(Vec2::splat(16.0), Sense::click());
-    ui.painter().rect_filled(rect, 3.0, color);
+    ui.painter().rect_filled(rect, theme::radius::SMALL, color);
     if selected {
-        ui.painter().rect_stroke(rect.expand(1.0), 3.0, Stroke::new(1.5_f32, Color32::WHITE));
+        ui.painter().rect_stroke(rect.expand(1.0), theme::radius::SMALL, Stroke::new(1.5_f32, Color32::WHITE));
     } else {
-        ui.painter().rect_stroke(rect, 3.0, Stroke::new(1.0_f32, Color32::from_gray(120)));
+        ui.painter().rect_stroke(rect, theme::radius::SMALL, Stroke::new(1.0_f32, theme::SWATCH_BORDER));
     }
     response.clicked()
 }

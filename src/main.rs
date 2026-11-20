@@ -11,6 +11,7 @@ mod hotkey;
 mod output;
 mod picker;
 mod pin;
+mod theme;
 mod tray;
 mod utils;
 
@@ -174,11 +175,15 @@ struct App {
     next_pin_id: u64,
     // 延迟截图倒计时
     pending_capture: Option<(CaptureAction, Instant)>,
+    // 当前主题（深色 = true），用于系统切换主题时重新装配样式
+    theme_dark: bool,
 }
 
 impl App {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
         install_cjk_font(&cc.egui_ctx);
+        theme::install(&cc.egui_ctx);
+        let theme_dark = cc.egui_ctx.style().visuals.dark_mode;
 
         let monitors = capture::enumerate_monitors();
         let (region_x, region_y, region_w, region_h) = monitors
@@ -239,6 +244,7 @@ impl App {
             pins: Vec::new(),
             next_pin_id: 1,
             pending_capture: None,
+            theme_dark,
         }
     }
 
@@ -418,9 +424,10 @@ impl App {
                 if ui.button("保存并应用").clicked() {
                     apply = true;
                 }
-                let light = !ui.visuals().dark_mode;
-                if ui.button(if light { "浅色主题" } else { "深色主题" }).clicked() {
-                    ui.ctx().set_visuals(if light { egui::Visuals::dark() } else { egui::Visuals::light() });
+                let dark = ui.visuals().dark_mode;
+                if ui.button(if dark { "深色主题" } else { "浅色主题" }).clicked() {
+                    self.theme_dark = !dark;
+                    theme::apply(ui.ctx(), self.theme_dark);
                 }
             });
 
@@ -429,7 +436,7 @@ impl App {
                 ui.label("热键状态");
                 for line in &self.hotkey_status {
                     let color = if line.contains("失败") || line.contains("无效") || line.contains("占用") {
-                        egui::Color32::from_rgb(220, 100, 80)
+                        theme::danger(ui.visuals())
                     } else {
                         ui.style().visuals.text_color()
                     };
@@ -441,7 +448,7 @@ impl App {
                 ui.separator();
                 for line in &self.settings_status {
                     let color = if line.contains("失败") {
-                        egui::Color32::from_rgb(220, 100, 80)
+                        theme::danger(ui.visuals())
                     } else {
                         ui.style().visuals.text_color()
                     };
@@ -826,6 +833,13 @@ impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let mut action = None;
 
+        // ---- 主题跟随：系统切换深浅色时重新装配自定义样式 ----
+        let dark = ctx.style().visuals.dark_mode;
+        if dark != self.theme_dark {
+            self.theme_dark = dark;
+            theme::apply(ctx, dark);
+        }
+
         // ---- 延迟截图倒计时 ----
         if let Some((pending, deadline)) = self.pending_capture {
             let now = Instant::now();
@@ -904,22 +918,22 @@ impl eframe::App for App {
         }
 
         egui::TopBottomPanel::top("toolbar").show(ctx, |ui| {
-            ui.add_space(4.0);
+            ui.add_space(theme::spacing::XS);
             if let Some(from_toolbar) = self.toolbar(ui) {
                 action = Some(from_toolbar);
             }
-            ui.add_space(4.0);
+            ui.add_space(theme::spacing::XS);
         });
 
         // ---- 编辑器工具栏 ----
         let mut editor_action = None;
         if self.editor.is_some() {
             egui::TopBottomPanel::top("editor_toolbar").show(ctx, |ui| {
-                ui.add_space(4.0);
+                ui.add_space(theme::spacing::XS);
                 if let Some(session) = &mut self.editor {
                     editor_action = editor::draw_toolbar(ui, &mut session.state);
                 }
-                ui.add_space(4.0);
+                ui.add_space(theme::spacing::XS);
             });
         }
 
@@ -927,8 +941,7 @@ impl eframe::App for App {
         let is_error = self.is_error;
         egui::TopBottomPanel::bottom("status").show(ctx, |ui| {
             ui.horizontal(|ui| {
-                let color =
-                    if is_error { egui::Color32::from_rgb(220, 80, 80) } else { ui.style().visuals.text_color() };
+                let color = if is_error { theme::danger(ui.visuals()) } else { ui.style().visuals.text_color() };
                 ui.colored_label(color, status);
             });
         });

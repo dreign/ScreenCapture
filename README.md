@@ -71,6 +71,7 @@ screencapture/
 ├── docs/
 │   ├── design.md        # 软件设计文档
 │   ├── progress.md      # 开发进度追踪
+│   ├── style-guide.md   # 界面样式规范（配色 / 字号 / 间距）
 │   └── user-guide.md    # 用户手册
 ├── scripts/
 │   ├── package.ps1      # Windows 便携包
@@ -91,6 +92,7 @@ screencapture/
 │   ├── output/          # 保存/剪贴板/文件名模板
 │   ├── hotkey/          # 热键解析 + 平台键码映射
 │   ├── tray/            # 托盘 + 热键注册（windows.rs / macos.rs）
+│   ├── theme/           # 统一视觉主题（配色 / 字号 / 间距 / 控件样式）
 │   └── utils/           # 工具函数
 ├── Cargo.toml
 ├── build.rs             # Windows 版本资源嵌入（作者 / 版本 / 版权）
